@@ -16,8 +16,7 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "php": ">=5.6",
-    "popov/zfc-current": "~0.1"
+    "php": ">=5.6"
   },
   "autoload": {
     "psr-4": {
