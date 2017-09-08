@@ -1,6 +1,6 @@
 {
   "name": "popov/zfc-form",
-  "description": "ZF2 form managment",
+  "description": "ZF2 form management",
   "type": "zf-module",
   "license": "MIT",
   "keywords": [
@@ -20,7 +20,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Popov\\ZfcFormr\\": "src/"
+      "Popov\\ZfcForm\\": "src/"
     }
   }
 }
