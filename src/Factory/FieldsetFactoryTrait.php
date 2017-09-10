@@ -20,7 +20,7 @@ use Zend\Stdlib\Exception\BadMethodCallException;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 
-//use Popov\Current\Plugin\Current;
+use Popov\ZfcCurrent\Plugin\Current;
 
 trait FieldsetFactoryTrait {
 
@@ -54,9 +54,12 @@ trait FieldsetFactoryTrait {
 
 		if ($fieldset instanceof ObjectManagerAwareInterface) {
             //\Zend\Debug\Debug::dump($fieldset->getName());
+            $entityClass = $this->getEntityObjectName($requestedName);
+            $entityObject = new $entityClass();
 			$fieldset->setHydrator((new DoctrineHydrator($om))
                 //->addStrategy('quantityItem', new \DoctrineModule\Stdlib\Hydrator\Strategy\DisallowRemoveByValue())
-                )->setObject($sm->get($this->getEntityObjectName($requestedName)));
+                //)->setObject($sm->get($this->getEntityObjectName($requestedName)));
+                )->setObject($entityObject);
 			$fieldset->setObjectManager($om);
 		}
 

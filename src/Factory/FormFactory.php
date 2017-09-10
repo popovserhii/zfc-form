@@ -17,7 +17,7 @@ use Zend\Form\FormElementManager;
 use Zend\ServiceManager\Exception;
 use Zend\I18n\Translator\TranslatorAwareInterface;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
-use Popov\Current\Plugin\Current;
+use Popov\ZfcCurrent\Plugin\Current;
 
 class FormFactory implements AbstractFactoryInterface {
 
