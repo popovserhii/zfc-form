@@ -10,10 +10,21 @@
 
 namespace Popov\ZfcForm\Factory;
 
-use Zend\ServiceManager\AbstractFactoryInterface;
+//use Zend\ServiceManager\AbstractFactoryInterface;
+use Interop\Container\ContainerInterface;
+use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 
 class FieldsetFactory implements AbstractFactoryInterface {
 
 	use FieldsetFactoryTrait;
 
+	public function canCreate(ContainerInterface $container, $requestedName)
+    {
+        return $this->canCreateServiceWithName($container, $requestedName);
+    }
+
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    {
+        return $this->createServiceWithName($container, $requestedName, $options);
+    }
 }

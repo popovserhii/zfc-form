@@ -10,7 +10,8 @@
 
 namespace Popov\ZfcForm\Factory;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Interop\Container\ContainerInterface;
+//use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\I18n\Translator\TranslatorAwareInterface;
 use Zend\Form\FormElementManager;
 use Zend\Form\Fieldset;
@@ -24,30 +25,27 @@ use Popov\ZfcCurrent\Plugin\Current;
 
 trait FieldsetFactoryTrait {
 
-	public function canCreateServiceWithName(ServiceLocatorInterface $fm, $name, $requestedName) {
+	public function canCreateServiceWithName(ContainerInterface $fm, /*$name, */$requestedName) {
 		//\Zend\Debug\Debug::dump([(substr($requestedName, -8) === 'Fieldset'), $requestedName]);
 		return (substr($requestedName, -8) === 'Fieldset');
 	}
 
-	public function createServiceWithName(ServiceLocatorInterface $fm, $name, $requestedName) {
+	public function createServiceWithName(ContainerInterface $container, /*$name, */$requestedName, array $options = null) {
 		if (!class_exists($requestedName)) {
 			throw new Exception\ServiceNotFoundException(sprintf(
-				'%s: failed retrieving "%s%s"; class does not exist',
+				'%s: failed retrieving "%s"; class does not exist',
 				get_class($this) . '::' . __FUNCTION__,
-				$requestedName,
-				($name ? '(alias: ' . $name . ')' : '')
+				$requestedName
+				//($name ? '(alias: ' . $name . ')' : '')
 			));
 		}
 
 		/** @var FormElementManager $fm */
-		$sm = $fm->getServiceLocator();
-		$cpm = $sm->get('ControllerPluginManager');
+		//$container = $fm->getServiceLocator();
 		//$dm = $sm->get('doctrine.documentmanager.odm_default');
-		$om = $sm->get('Doctrine\ORM\EntityManager');
+		$om = $container->get('Doctrine\ORM\EntityManager');
         /** @var Current $currentPlugin */
         //$currentPlugin = $cpm->get('current');
-        $modulePlugin = $cpm->get('module');
-
 
 		/** @var Fieldset $fieldset (type of) */
 		$fieldset = new $requestedName();
@@ -64,13 +62,13 @@ trait FieldsetFactoryTrait {
 		}
 
         if ($fieldset instanceof TranslatorAwareInterface) {
+            $cpm = $container->get('ControllerPluginManager');
+            $modulePlugin = $cpm->get('module');
+
             /** @var \Zend\Mvc\I18n\Translator $translator */
-            $translator = $sm->get('translator');
-            //\Zend\Debug\Debug::dump([get_class($translator)]); //die(__METHOD__);
-            //$translator->setTranslatorTextDomain($currentPlugin->currentModule($fieldset));
+            $translator = $container->get('translator');
             $fieldset->setTranslator($translator);
             $fieldset->setTranslatorTextDomain($modulePlugin->setRealContext($fieldset)->getRealModule()->getName());
-            //$fieldset->setModule($modulePlugin->setRealContext($fieldset)->getModule());
         }
 
 		return $fieldset;

@@ -10,7 +10,9 @@
 
 namespace Popov\ZfcForm\Factory;
 
-use Zend\ServiceManager\AbstractFactoryInterface;
+use Interop\Container\ContainerInterface;
+//use Zend\ServiceManager\AbstractFactoryInterface;
+use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Form\Form;
 use Zend\Form\FormElementManager;
@@ -19,30 +21,25 @@ use Zend\I18n\Translator\TranslatorAwareInterface;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 use Popov\ZfcCurrent\Plugin\Current;
 
-class FormFactory implements AbstractFactoryInterface {
-
-	public function canCreateServiceWithName(ServiceLocatorInterface $sm, $name, $requestedName) {
-		//\Zend\Debug\Debug::dump([debug_backtrace()[1]['class'], debug_backtrace()[1]['function'], (substr($requestedName, -4) === 'Form'), $requestedName]);
-
+class FormFactory implements AbstractFactoryInterface
+{
+	public function canCreate(ContainerInterface$container, /*$name, */$requestedName) {
 		return (substr($requestedName, -4) === 'Form');
 	}
 
-	public function createServiceWithName(ServiceLocatorInterface $fm, $name, $requestedName) {
+	public function __invoke(ContainerInterface $container, $requestedName, array $options = null/*$requestedName*/) {
 		if (!class_exists($requestedName)) {
 			throw new Exception\ServiceNotFoundException(sprintf(
-				'%s: failed retrieving "%s%s"; class does not exist',
+				'%s: failed retrieving "%s"; class does not exist',
 				get_class($this) . '::' . __FUNCTION__,
-				$requestedName,
-				($name ? '(alias: ' . $name . ')' : '')
+				$requestedName
+				//($name ? '(alias: ' . $name . ')' : '')
 			));
 		}
 
 		/** @var FormElementManager $fm */
-		$sm = $fm->getServiceLocator();
-        $om = $sm->get('Doctrine\ORM\EntityManager');
-        $cpm = $sm->get('ControllerPluginManager');
-        /** @var Current $currentPlugin */
-        $currentPlugin = $cpm->get('current');
+		//$container = $fm->getServiceLocator();
+        $om = $container->get('Doctrine\ORM\EntityManager');
 		//die(__METHOD__);
 
 		/** @var Form $form (type of) */
@@ -54,8 +51,20 @@ class FormFactory implements AbstractFactoryInterface {
 			//->init() // @todo: This must call automatically but not work http://stackoverflow.com/a/29503188
 		;
 
+        /*if ($form instanceof TranslatorAwareInterface) {
+            $cpm = $container->get('ControllerPluginManager');
+            $currentPlugin = $cpm->get('current');
+            $form->setTranslator($container->get('translator', $currentPlugin->currentModule($form)));
+        }*/
+
         if ($form instanceof TranslatorAwareInterface) {
-            $form->setTranslator($sm->get('translator', $currentPlugin->currentModule($form)));
+            $cpm = $container->get('ControllerPluginManager');
+            $modulePlugin = $cpm->get('module');
+
+            /** @var \Zend\Mvc\I18n\Translator $translator */
+            $translator = $container->get('translator');
+            $form->setTranslator($translator);
+            $form->setTranslatorTextDomain($modulePlugin->setRealContext($form)->getRealModule()->getName());
         }
 
 		return $form;
