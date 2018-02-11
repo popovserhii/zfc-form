@@ -8,16 +8,16 @@
  */
 namespace Popov\ZfcForm;
 
-use Zend\Mvc\MvcEvent;
-use Zend\Mvc\ModuleRouteListener;
-use Zend\Form\View\Helper\FormElement;
-use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 
 class Module implements ConfigProviderInterface
 {
     public function getConfig()
     {
+        $config = include __DIR__ . '/../config/module.config.php';
+        $config['service_manager'] = $config['dependencies'];
+        unset($config['dependencies']);
+
         return include __DIR__ . '/../config/module.config.php';
     }
 }

@@ -2,6 +2,7 @@
 namespace Popov\ZfcForm;
 
 use Popov\ZfcCore\Service;
+use Popov\ZfcForm\Factory\FormElementManagerFactory;
 
 return [
 
@@ -33,10 +34,13 @@ return [
         ],
 	],
 
-	'service_manager' => [
+	'dependencies' => [
 		'invokables' => [
 			'Zend\InputFilter\InputFilter' => 'Zend\InputFilter\InputFilter',
 		],
+        'factories' => [
+            FormElementManager::class => FormElementManagerFactory::class,
+        ],
 		'shared' => [
 			'Zend\InputFilter\InputFilter' => false,
 		],
