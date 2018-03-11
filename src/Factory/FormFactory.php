@@ -10,8 +10,12 @@
 
 namespace Popov\ZfcForm\Factory;
 
+use DoctrineModule\Persistence\ObjectManagerAwareInterface;
 use Interop\Container\ContainerInterface;
 //use Zend\ServiceManager\AbstractFactoryInterface;
+use Popov\ZfcEntity\Helper\ModuleHelper;
+use Zend\I18n\Translator\Translator;
+use Zend\I18n\Translator\TranslatorInterface;
 use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Form\Form;
@@ -39,18 +43,19 @@ class FormFactory implements AbstractFactoryInterface
 
 		/** @var FormElementManager $fm */
 		//$container = $fm->getServiceLocator();
-        $om = $container->get('Doctrine\ORM\EntityManager');
 		//die(__METHOD__);
 
 		/** @var Form $form (type of) */
 		$form = new $requestedName();
-		$form->setAttribute('method', 'post')
-			->setHydrator(new DoctrineHydrator($om))
-            // this injects automatically on vendor/zendframework/zend-form/src/Form.php:691
-			# ->setInputFilter($sm->get('Zend\InputFilter\InputFilter'))
-			//->init() // @todo: This must call automatically but not work http://stackoverflow.com/a/29503188
-		;
-
+		$form->setAttribute('method', 'post');
+        if ($form instanceof ObjectManagerAwareInterface) {
+            $om = $container->get('Doctrine\ORM\EntityManager');
+            $form->setHydrator(new DoctrineHydrator($om))
+                // this injects automatically on vendor/zendframework/zend-form/src/Form.php:691
+                # ->setInputFilter($sm->get('Zend\InputFilter\InputFilter'))
+                //->init() // @todo: This must call automatically but not work http://stackoverflow.com/a/29503188
+            ;
+        }
         /*if ($form instanceof TranslatorAwareInterface) {
             $cpm = $container->get('ControllerPluginManager');
             $currentPlugin = $cpm->get('current');
@@ -58,13 +63,12 @@ class FormFactory implements AbstractFactoryInterface
         }*/
 
         if ($form instanceof TranslatorAwareInterface) {
-            $cpm = $container->get('ControllerPluginManager');
-            $modulePlugin = $cpm->get('module');
-
-            /** @var \Zend\Mvc\I18n\Translator $translator */
-            $translator = $container->get('translator');
+            /** @var ModuleHelper $moduleHelper */
+            $moduleHelper = $container->get(ModuleHelper::class);
+            /** @var Translator $translator */
+            $translator = $container->get(TranslatorInterface::class);
             $form->setTranslator($translator);
-            $form->setTranslatorTextDomain($modulePlugin->setRealContext($form)->getRealModule()->getName());
+            $form->setTranslatorTextDomain($moduleHelper->setRealContext($form)->getModule()->getName());
         }
 
 		return $form;
