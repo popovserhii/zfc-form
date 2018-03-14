@@ -4,7 +4,7 @@
  *
  * @category Popov
  * @package Popov_Form
- * @author Popov Sergiy <popov@agere.com.ua>
+ * @author Serhii Popov <popow.serhii@gmail.com>
  * @datetime: 17.02.15 22:24
  */
 

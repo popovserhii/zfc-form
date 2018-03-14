@@ -4,7 +4,7 @@
  *
  * @category Popov
  * @package Popov_Form
- * @author Popov Sergiy <popov@agere.com.ua>
+ * @author Serhii Popov <popow.serhii@gmail.com>
  * @datetime: 17.02.15 22:24
  */
 
@@ -42,7 +42,18 @@ trait FieldsetFactoryTrait
         $fieldset = new $requestedName();
         if ($fieldset instanceof ObjectManagerAwareInterface) {
             $om = $container->get('Doctrine\ORM\EntityManager');
-            $entityClass = $this->getEntityObjectName($requestedName);
+            $entityClass = method_exists($fieldset, 'getObjectName')
+                ? $fieldset->getObjectName()
+                : $this->getEntityObjectName($requestedName);
+
+            if (!class_exists($entityClass)) {
+                throw new Exception\ServiceNotFoundException(sprintf(
+                    '%s: failed retrieving "%s"; class does not exist',
+                    get_class($this) . '::' . __FUNCTION__,
+                    $requestedName
+                ));
+            }
+
             $entityObject = new $entityClass();
 
             $fieldset->setHydrator((new DoctrineHydrator($om)))->setObject($entityObject);
@@ -63,6 +74,32 @@ trait FieldsetFactoryTrait
     protected function getEntityObjectName($requestedName)
     {
         $entityNamespace = $this->convertNamespace($requestedName, 'Form', 'Model', 'Fieldset');
+
+        return $entityNamespace;
+    }
+
+
+    /**
+     * Example:
+     *    Popov\Invoice\Form\InvoiceProduct\QuantityItem => Popov\Invoice\Model\InvoiceProduct\QuantityItem
+     *    QuantityItemFieldset => QuantityItem
+     *
+     * @param string $name Converted name
+     * @param string $from From 'Model'
+     * @param string $to To 'Form'
+     * @param string $ending End part of first argument which will be replaced or deleted
+     * @return string
+     */
+    protected function convertNamespace($name, $from, $to, $ending)
+    {
+        $info = $this->getNamespaceInfo($name);
+        $parts = [
+            $info['module'],
+            $info['module'] ? $to : '',
+            trim(str_replace($from, '', $info['relative']), '\\'),
+            $info['module'] ? strstr($info['class'], $ending, true) : str_replace($ending, $to, $info['class']),
+        ];
+        $entityNamespace = implode('\\', array_filter($parts));
 
         return $entityNamespace;
     }
@@ -90,30 +127,5 @@ trait FieldsetFactoryTrait
         }
 
         return $cache[$namespace];
-    }
-
-    /**
-     * Example:
-     *    Popov\Invoice\Form\InvoiceProduct\QuantityItem => Popov\Invoice\Model\InvoiceProduct\QuantityItem
-     *    QuantityItemFieldset => QuantityItem
-     *
-     * @param string $name Converted name
-     * @param string $from From 'Model'
-     * @param string $to To 'Form'
-     * @param string $ending End part of first argument which will be replaced or deleted
-     * @return string
-     */
-    protected function convertNamespace($name, $from, $to, $ending)
-    {
-        $info = $this->getNamespaceInfo($name);
-        $parts = [
-            $info['module'],
-            $info['module'] ? $to : '',
-            trim(str_replace($from, '', $info['relative']), '\\'),
-            $info['module'] ? strstr($info['class'], $ending, true) : str_replace($ending, $to, $info['class']),
-        ];
-        $entityNamespace = implode('\\', array_filter($parts));
-
-        return $entityNamespace;
     }
 }
