@@ -27,27 +27,27 @@ use Popov\ZfcCurrent\Plugin\CurrentHelper;
 
 class FormFactory implements AbstractFactoryInterface
 {
-	public function canCreate(ContainerInterface$container, /*$name, */$requestedName) {
-		return (substr($requestedName, -4) === 'Form');
-	}
+    public function canCreate(ContainerInterface$container, /*$name, */$requestedName) {
+        return (substr($requestedName, -4) === 'Form');
+    }
 
-	public function __invoke(ContainerInterface $container, $requestedName, array $options = null/*$requestedName*/) {
-		if (!class_exists($requestedName)) {
-			throw new Exception\ServiceNotFoundException(sprintf(
-				'%s: failed retrieving "%s"; class does not exist',
-				get_class($this) . '::' . __FUNCTION__,
-				$requestedName
-				//($name ? '(alias: ' . $name . ')' : '')
-			));
-		}
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null/*$requestedName*/) {
+        if (!class_exists($requestedName)) {
+            throw new Exception\ServiceNotFoundException(sprintf(
+                '%s: failed retrieving "%s"; class does not exist',
+                get_class($this) . '::' . __FUNCTION__,
+                $requestedName
+            //($name ? '(alias: ' . $name . ')' : '')
+            ));
+        }
 
-		/** @var FormElementManager $fm */
-		//$container = $fm->getServiceLocator();
-		//die(__METHOD__);
+        /** @var FormElementManager $fm */
+        //$container = $fm->getServiceLocator();
+        //die(__METHOD__);
 
-		/** @var Form $form (type of) */
-		$form = new $requestedName();
-		$form->setAttribute('method', 'post');
+        /** @var Form $form (type of) */
+        $form = new $requestedName();
+        $form->setAttribute('method', 'post');
         if ($form instanceof ObjectManagerAwareInterface) {
             $om = $container->get('Doctrine\ORM\EntityManager');
             $form->setHydrator(new DoctrineHydrator($om))
@@ -71,7 +71,7 @@ class FormFactory implements AbstractFactoryInterface
             $form->setTranslatorTextDomain($moduleHelper->setRealContext($form)->getModule()->getName());
         }
 
-		return $form;
-	}
+        return $form;
+    }
 
 }

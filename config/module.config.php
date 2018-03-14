@@ -30,7 +30,7 @@ return [
         'initializers' => [
             'ConfigAwareInterface' => Service\Factory\ConfigInitializer::class,
             'DomainServiceInitializer' => Service\Factory\DomainServiceInitializer::class,
-            //'ObjectManagerAwareInterface' => Service\Factory\ObjectManagerInitializer::class,
+            'ObjectManagerAwareInterface' => Service\Factory\ObjectManagerInitializer::class,
         ],
 	],
 
