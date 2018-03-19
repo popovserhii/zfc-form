@@ -1,0 +1,57 @@
+<?php
+/**
+ * The MIT License (MIT)
+ * Copyright (c) 2018 Stagem Team
+ * This source file is subject to The MIT License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/MIT
+ *
+ * @category Stagem
+ * @package Stagem_ZfcForm
+ * @author Serhii Popov <popow.serhii@gmail.com>
+ * @license https://opensource.org/licenses/MIT The MIT License (MIT)
+ */
+use Zend\Form\Element\Collection as FieldsetCollection;
+use Zend\Form\Element\Submit;
+?>
+<?php $elementOrFieldset = $this->vars('fieldset'); ?>
+<?php //$key = $this->vars('key'); ?>
+<legend>
+	<?= $this->formLabel($elementOrFieldset) ?>
+	<?php if ($elementOrFieldset instanceof FieldsetCollection && $elementOrFieldset->getOption('allow_add')) : ?>
+		<?php $name = str_replace(['[',']'], ['-', ''], $elementOrFieldset->getName()); ?>
+		<?php $submit = new Submit('add-' . $name); ?>
+		<?php $submit->setAttributes([
+            'type' => 'submit',
+            'value' => '+',
+            'class' => 'add-answer add-field-group btn btn-success small-btn',
+            'data-group-id' => $name,
+        ]); ?>
+        <?//= $this->formRow($submit, null, null, 'form::element') ?>
+        <?= $this->formElement($submit) ?>
+    <?php endif; ?>
+</legend>
+<?php if ($elementOrFieldset instanceof FieldsetCollection) : ?>
+    <?php $name = str_replace(['[',']'], ['-', ''], $elementOrFieldset->getName()); ?>
+	<fieldset id="<?= $name ?>">
+        <?php foreach ($elementOrFieldset as /*$_key =>*/$fieldset) : ?>
+			<div class="form-group">
+                <?= $this->partial('form::element-group', ['fieldset' => $fieldset]) ?>
+			</div>
+        <?php endforeach; ?>
+	</fieldset>
+    <?php $this->formRow()->setPartial(null); // zf bug with nested custom template render ?>
+    <?= $this->formCollection()->renderTemplate($elementOrFieldset) ?>
+<?php else : ?>
+    <?php foreach ($elementOrFieldset as $key => $subElementOrFieldset) : ?>
+        <?php if ($subElementOrFieldset instanceof \Zend\Form\FieldsetInterface) : ?>
+            <?php $name = str_replace(['[',']'], ['-', ''], $elementOrFieldset->getName()); ?>
+			<fieldset id="<?= $name ?>">
+                <?= $this->partial('form::fieldset', ['fieldset' => $subElementOrFieldset/*, 'key' => $key*/]) ?>
+			</fieldset>
+        <?php else : ?>
+            <?= $this->formRow($subElementOrFieldset, null, null, 'form::element') ?>
+        <?php endif; ?>
+    <?php endforeach; ?>
+<?php endif; ?>

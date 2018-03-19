@@ -1,0 +1,40 @@
+<?php
+/**
+ * The MIT License (MIT)
+ * Copyright (c) 2018 Serhii Popov
+ * This source file is subject to The MIT License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/MIT
+ *
+ * @category Popov
+ * @package Popov_<package>
+ * @author Serhii Popov <popow.serhii@gmail.com>
+ * @license https://opensource.org/licenses/MIT The MIT License (MIT)
+ */
+?>
+
+<?php $type = $element->getAttribute('type'); ?>
+<?php if ('hidden' === $type) : ?>
+    <?= $this->formElement($element); ?>
+<?php else : ?>
+	<div class="form-group">
+        <?php if ('checkbox' === $type) : ?>
+            <?= $this->formRow(/*)->setPartial(null)->render(*/$element, null, null, 'form::checkbox'); ?>
+            <? //= $this->partial('form::checkbox', ['element' => $element]); ?>
+        <?php else : ?>
+            <?php $rightClass = 'col-sm-offset-1 col-sm-6'; ?>
+            <?php if ($element->getLabel()) : ?>
+                <?php $rightClass = 'col-sm-6'; ?>
+				<!--<label for="inputEmail3" class="col-sm-2 control-label">Email</label>-->
+                <?php $element->setLabelAttributes(['class' => 'col-sm-1 control-label']) ?>
+                <?= $this->formLabel($element) ?>
+            <?php endif; ?>
+			<div class="<?= $rightClass ?>">
+                <?= $this->formElement($element) ?>
+				<!--<span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>-->
+                <? //= $this->formElementErrors($element) ?>
+			</div>
+        <?php endif; ?>
+	</div>
+<?php endif; ?>

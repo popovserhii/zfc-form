@@ -1,0 +1,40 @@
+<?php
+/**
+ * The MIT License (MIT)
+ * Copyright (c) 2018 Stagem Team
+ * This source file is subject to The MIT License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/MIT
+ *
+ * @category Stagem
+ * @package Stagem_ZfcForm
+ * @author Serhii Popov <popow.serhii@gmail.com>
+ * @license https://opensource.org/licenses/MIT The MIT License (MIT)
+ */
+use Zend\Form\FieldsetInterface;
+?>
+<?php
+$form = $this->vars('form');
+$form->setAttribute('class', 'form-horizontal');
+$form->prepare();
+?>
+<div class="row">
+    <!-- left column -->
+    <div class="col-md-12">
+        <!-- general form elements -->
+        <div class="box box-primary">
+            <div class="box-body">
+                <?= $this->form(null, null)->openTag($form) ?>
+                <?php foreach ($form as $key => $elementOrFieldset) : ?>
+                    <?php if ($elementOrFieldset instanceof FieldsetInterface) : ?>
+                        <?= $this->partial('form::fieldset', ['fieldset' => $elementOrFieldset]) ?>
+                    <?php else : ?>
+                        <?= $this->formRow($elementOrFieldset, null, null, 'form::element'); ?>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+                <?= $this->form()->closeTag() ?>
+            </div>
+        </div>
+    </div>
+</div>

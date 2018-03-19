@@ -59,4 +59,10 @@ return [
 	],
 
 
+    'templates' =>  [
+        'paths' => [
+            'form'  => [__DIR__ . '/../view/partial'],
+        ],
+    ],
+
 ];
