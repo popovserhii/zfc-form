@@ -19,6 +19,9 @@ $(document).on('submit', 'form.ajax', function(event) {
 $(document).on('click', '.add-field-group', function (e) {
     var fieldset = $('#' + $(this).data('group-id'));
     var fieldGroups = fieldset.find('.form-group'); //fieldset.find('.field-group');
+    if (!fieldGroups.length) {
+      fieldGroups = fieldset.find('.field-group');
+    }
     //var template = $(fieldset.children('span[data-template]').data('template').replace(/__index__/g, fieldGroups.length));
     var template = $(fieldset.next('span[data-template]').data('template').replace(/__index__/g, fieldGroups.length));
     var fieldGroupTemp = fieldGroups.last().clone();
