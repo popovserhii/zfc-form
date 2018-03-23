@@ -8,42 +8,27 @@
  * https://opensource.org/licenses/MIT
  *
  * @category Popov
- * @package Popov_<package>
+ * @package Popov_ZfcForm
  * @author Serhii Popov <popow.serhii@gmail.com>
  * @license https://opensource.org/licenses/MIT The MIT License (MIT)
  */
 ?>
-
-
 <?php $this->formRow()->setPartial(null); ?>
-<?php foreach ($fieldset as $_subElementOrFieldset) : ?>
-    <?php if ($_subElementOrFieldset instanceof \Zend\Form\Element\Hidden) : ?>
-        <?= $this->formElement($_subElementOrFieldset); ?>
+<?php $count = count($fieldset); ?>
+<?php $column = ($count <= 6) ? 2 : 1; ?>
+<?php foreach ($fieldset as $element) : ?>
+    <?php $type = $element->getAttribute('type'); ?>
+    <?php if ('hidden' === $type) : ?>
+        <?= $this->formElement($element) ?>
     <?php else : ?>
-        <div class="col-sm-5">
-            <?php $type = $_subElementOrFieldset->getAttribute('type'); ?>
+        <div class="col-sm-<?= $column ?>">
             <?php if ('checkbox' === $type) : ?>
-                <?= $this->formRow(/*)->setPartial(null)->render(*/$_subElementOrFieldset, null, null, 'form::checkbox'); ?>
+                <?= $this->formRow($element, null, null, 'form::checkbox') ?>
                 <?//= $this->partial('form::checkbox', ['element' => $element]); ?>
             <?php else : ?>
+                <?= $this->formElement($element) ?>
                 <?//= $this->formRow($_subElementOrFieldset, null, null, 'form::element'); ?>
-                <?= $this->formElement($_subElementOrFieldset) ?>
             <?php endif; ?>
         </div>
     <?php endif; ?>
-
-
 <?php endforeach; ?>
-
-<!--
-<div class="col-sm-offset-2 col-sm-5">
-    <input class="form-control" id="inputEmail3" placeholder="Email" type="email">
-</div>
-<div class="col-sm-5">
-    <div class="checkbox">
-        <label>
-            <input type="checkbox"> Remember me
-        </label>
-    </div>
-</div>
--->

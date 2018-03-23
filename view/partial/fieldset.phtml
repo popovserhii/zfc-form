@@ -25,7 +25,8 @@ use Zend\Form\Element\Submit;
 		<?php $submit->setAttributes([
             'type' => 'submit',
             'value' => '+',
-            'class' => 'add-answer add-field-group btn btn-success small-btn',
+            //'class' => 'add-answer add-field-group btn btn-success small-btn',
+            'class' => 'add-field-group btn btn-success small-btn',
             'data-group-id' => $name,
         ]); ?>
         <?//= $this->formRow($submit, null, null, 'form::element') ?>
@@ -36,6 +37,18 @@ use Zend\Form\Element\Submit;
     <?php $name = str_replace(['[',']'], ['-', ''], $elementOrFieldset->getName()); ?>
 	<fieldset id="<?= $name ?>">
         <?php foreach ($elementOrFieldset as /*$_key =>*/$fieldset) : ?>
+            <?php if ($elementOrFieldset->getOption('allow_add')) : // if we can add, then we can remove it ?>
+                <?php //$submit = new Submit('remove-' . $name); ?>
+                <?php $submit = new Submit('remove'); ?>
+	            <?php $submit->setAttributes([
+	                'type' => 'submit',
+	                'value' => '-',
+	                //'class' => 'add-answer add-field-group btn btn-success small-btn',
+	                'class' => 'remove-field-group btn btn-danger small-btn',
+	                //'data-group-id' => $name,
+	            ]); ?>
+		        <?php $fieldset->add($submit); ?>
+		        <?php endif; ?>
 			<div class="form-group">
                 <?= $this->partial('form::element-group', ['fieldset' => $fieldset]) ?>
 			</div>
