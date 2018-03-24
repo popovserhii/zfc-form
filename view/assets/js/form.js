@@ -42,7 +42,7 @@ PopovForm = {
     fieldGroupTemp.find('input, button, select, textarea, label').each(function () {
       var elm = $(this);
       var attrName = elm.is('label') ? 'for' : 'name';
-      var name = elm.attr(attrName).replace(numGroup - 1, numGroup);
+      var name = elm.attr(attrName).replace(/\d/, numGroup); // with many levels of fieldset may be problem with number replace
 
       if (elm.is('label')) {
         elm.attr(attrName, name);
