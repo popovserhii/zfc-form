@@ -1,32 +1,72 @@
 PopovForm = {
-	body: $('body'),
-	onlyOnce: {},
+  body: $('body'),
+  onlyOnce: {},
 
-	attachEvents: function() {
-		this.attachOnAddGroup();
-		this.attachOnRemoveGroup();
-	},
+  attachEvents: function () {
+    this.attachAjaxForm();
+    this.attachOnAddGroup();
+    this.attachOnRemoveGroup();
+  },
 
-	// Add Group Elements
-	attachOnAddGroup: function() {
-		// Remove handler from existing elements
-		this.body.off('click', '.add-field-group', this.addGroup);
-
-    // Re-add event handler for all matching elements
-		this.body.on('click', '.add-field-group', this.addGroup);
-	},
-
-	// Remove Group Elements
-	attachOnRemoveGroup: function() {
-		// Remove handler from existing elements
-		this.body.off('click', '.remove-field-group', this.removeGroup);
+  // Ajax Form
+  attachAjaxForm: function () {
+    // Remove handler from existing elements
+    this.body.off('submit', 'form.ajax', this.ajaxForm);
 
     // Re-add event handler for all matching elements
-		this.body.on('click', '.remove-field-group', this.removeGroup);
-	},
+    this.body.on('submit', 'form.ajax', this.ajaxForm);
+  },
+
+  // Add Group Elements
+  attachOnAddGroup: function () {
+    // Remove handler from existing elements
+    this.body.off('click', '.add-field-group', this.addGroup);
+
+    // Re-add event handler for all matching elements
+    this.body.on('click', '.add-field-group', this.addGroup);
+  },
+
+  // Remove Group Elements
+  attachOnRemoveGroup: function () {
+    // Remove handler from existing elements
+    this.body.off('click', '.remove-field-group', this.removeGroup);
+
+    // Re-add event handler for all matching elements
+    this.body.on('click', '.remove-field-group', this.removeGroup);
+  },
+
+  ajaxForm: function (e) {
+    // ajax form
+    // process the form
+    var form = $(this);
+    var wrapped = form.closest('.block');
+
+    StagemPreloader.load(wrapped);
+
+    $.ajax({
+      type: form.attr('method'),
+      url: form.attr('action'),
+      dataType: 'html',
+      data: form.serialize(),
+      encode: true
+    }).done(function (data) {
+      // if 'data-refresh' set than that element will be replaced with content returned after form process
+      StagemPreloader.hide(wrapped);
+      if (form.data('refresh')) {
+        var elm = $(form.data('refresh'));
+        elm.replaceWith(data);
+      } else {
+        form.parent().html(data);
+      }
+    }).fail(function (data) {
+      StagemPreloader.load(wrapped);
+      $(data).insertBefore(form);
+    });
+    e.preventDefault();
+  },
 
   addGroup: function () {
-		var self = PopovForm;
+    var self = PopovForm;
     var fieldset = $('#' + $(this).data('group-id'));
     var fieldGroups = self.getFieldGroups(fieldset);
 
@@ -60,7 +100,7 @@ PopovForm = {
     self.body.data(numGroupKey, numGroup);
 
     return false;
-	},
+  },
 
   removeGroup: function () {
     var self = PopovForm;
@@ -75,9 +115,9 @@ PopovForm = {
     }
 
     return false;
-	},
+  },
 
-	getFieldGroups: function(fieldset) {
+  getFieldGroups: function (fieldset) {
     var fieldGroups = fieldset.find('.field-group'); //fieldset.find('.field-group');
     if (!fieldGroups.length) {
       fieldGroups = fieldset.find('.form-group');
@@ -98,5 +138,5 @@ PopovForm = {
 };
 
 jQuery(document).ready(function ($) {
-	PopovForm.attachEvents();
+  PopovForm.attachEvents();
 });
