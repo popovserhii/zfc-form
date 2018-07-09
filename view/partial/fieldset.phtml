@@ -1,14 +1,14 @@
 <?php
 /**
  * The MIT License (MIT)
- * Copyright (c) 2018 Stagem Team
+ * Copyright (c) 2018 Serhii Popov
  * This source file is subject to The MIT License (OSL 3.0)
  * that is bundled with this package in the file LICENSE.txt.
  * It is also available through the world-wide-web at this URL:
  * https://opensource.org/licenses/MIT
  *
- * @category Stagem
- * @package Stagem_ZfcForm
+ * @category Popov
+ * @package Popov_ZfcForm
  * @author Serhii Popov <popow.serhii@gmail.com>
  * @license https://opensource.org/licenses/MIT The MIT License (MIT)
  */
@@ -17,6 +17,7 @@ use Zend\Form\Element\Submit;
 ?>
 <?php $elementOrFieldset = $this->vars('fieldset'); ?>
 <?php //$key = $this->vars('key'); ?>
+<?php if ($elementOrFieldset->getLabel()) : ?>
 <legend>
 	<?= $this->formLabel($elementOrFieldset) ?>
 	<?php if ($elementOrFieldset instanceof FieldsetCollection && $elementOrFieldset->getOption('allow_add')) : ?>
@@ -33,6 +34,8 @@ use Zend\Form\Element\Submit;
         <?= $this->formElement($submit) ?>
     <?php endif; ?>
 </legend>
+<?php endif; ?>
+
 <?php if ($elementOrFieldset instanceof FieldsetCollection) : ?>
     <?php $name = str_replace(['[',']'], ['-', ''], $elementOrFieldset->getName()); ?>
 	<fieldset id="<?= $name ?>">
@@ -48,7 +51,7 @@ use Zend\Form\Element\Submit;
 	                //'data-group-id' => $name,
 	            ]); ?>
 		        <?php $fieldset->add($submit); ?>
-		        <?php endif; ?>
+	        <?php endif; ?>
 			<div class="form-group">
                 <?= $this->partial('form::element-group', ['fieldset' => $fieldset]) ?>
 			</div>
@@ -60,9 +63,17 @@ use Zend\Form\Element\Submit;
     <?php foreach ($elementOrFieldset as $key => $subElementOrFieldset) : ?>
         <?php if ($subElementOrFieldset instanceof \Zend\Form\FieldsetInterface) : ?>
             <?php $name = str_replace(['[',']'], ['-', ''], $elementOrFieldset->getName()); ?>
-			<fieldset id="<?= $name ?>">
-                <?= $this->partial('form::fieldset', ['fieldset' => $subElementOrFieldset/*, 'key' => $key*/]) ?>
-			</fieldset>
+
+			<?php // if set "inline" option of fieldset than render inline form ?>
+			<?php if ($subElementOrFieldset->getOption('inline')) : ?>
+				<div class="form-group">
+	                <?= $this->partial('form::element-group', ['fieldset' => $subElementOrFieldset]) ?>
+				</div>
+			<?php else : ?>
+				<fieldset id="<?= $name ?>">
+	                <?= $this->partial('form::fieldset', ['fieldset' => $subElementOrFieldset/*, 'key' => $key*/]) ?>
+				</fieldset>
+			<?php endif; ?>
         <?php else : ?>
             <?= $this->formRow($subElementOrFieldset, null, null, 'form::element') ?>
         <?php endif; ?>

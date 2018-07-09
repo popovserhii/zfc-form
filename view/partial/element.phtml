@@ -15,7 +15,8 @@
 ?>
 
 <?php $type = $element->getAttribute('type'); ?>
-<?php if ('hidden' === $type) : ?>
+<?php //$inline = $element->getOption('inline'); ?>
+<?php if ('hidden' === $type/* || $inline*/) : ?>
     <?= $this->formElement($element); ?>
 <?php else : ?>
 	<div class="form-group">
@@ -23,11 +24,13 @@
             <?= $this->formRow(/*)->setPartial(null)->render(*/$element, null, null, 'form::checkbox'); ?>
             <? //= $this->partial('form::checkbox', ['element' => $element]); ?>
         <?php else : ?>
-            <?php $rightClass = 'col-sm-offset-1 col-sm-6'; ?>
+            <?php //$columnLabel = $element->getOption('column') ? 4 : 2; ?>
+            <?php //$columnValue = $element->getOption('column') ? 8 : 6; ?>
+            <?php $column = $element->getOption('column') ? ['label' => 4, 'value' => 8] : ['label' => 2, 'value' => 6]; ?>
+            <?php $rightClass = "col-sm-offset-{$column['label']} col-sm-{$column['value']}"; ?>
             <?php if ($element->getLabel()) : ?>
-                <?php $rightClass = 'col-sm-6'; ?>
-				<!--<label for="inputEmail3" class="col-sm-2 control-label">Email</label>-->
-                <?php $element->setLabelAttributes(['class' => 'col-sm-1 control-label']) ?>
+                <?php $rightClass = "col-sm-{$column['value']}"; ?>
+                <?php $element->setLabelAttributes(['class' => "col-sm-{$column['label']} control-label"]) ?>
                 <?= $this->formLabel($element) ?>
             <?php endif; ?>
 			<div class="<?= $rightClass ?>">

@@ -13,21 +13,37 @@
  * @license https://opensource.org/licenses/MIT The MIT License (MIT)
  */
 ?>
+<?php $countVisible = function($fieldset) {
+	//$num = count($fieldset);
+	$num = 0;
+	foreach ($fieldset as $element) {
+		if ('hidden' == $element->getAttribute('type')) {
+            continue;
+		}
+        $num++;
+	}
+	return $num;
+} ?>
+
 <?php $this->formRow()->setPartial(null); ?>
-<?php $count = count($fieldset); ?>
-<?php $column = ($count <= 6) ? 2 : 1; ?>
+<?php $count = $countVisible($fieldset); // це рахує також hidden елементи, тому результат не првильний ?>
+<?php //$column = ($count <= 6) ? 2 : 1; ?>
+<?php $column = ($count <= 3) ? 4 : (($count <= 6) ? 2 : 1); ?>
 <?php foreach ($fieldset as $element) : ?>
     <?php $type = $element->getAttribute('type'); ?>
     <?php if ('hidden' === $type) : ?>
         <?= $this->formElement($element) ?>
     <?php else : ?>
-        <div class="col-sm-<?= $column ?>">
+        <?php //$column = $element->getOption('column') ?: $column; ?>
+		<?php // Be careful, don't override $column value, such as you lose default value which set before foreach ?>
+        <?php // By default all elements have the same size, but this can be changed with $element->setOption('column', $number) ?>
+		<div class="col-sm-<?= $element->getOption('column') ?: $column ?>">
             <?php if ('checkbox' === $type) : ?>
                 <?= $this->formRow($element, null, null, 'form::checkbox') ?>
                 <?//= $this->partial('form::checkbox', ['element' => $element]); ?>
             <?php else : ?>
-                <?= $this->formElement($element) ?>
-                <?//= $this->formRow($_subElementOrFieldset, null, null, 'form::element'); ?>
+                <?//= $this->formElement($element) ?>
+                <?= $this->formRow($element, null, null, 'form::element'); ?>
             <?php endif; ?>
         </div>
     <?php endif; ?>
