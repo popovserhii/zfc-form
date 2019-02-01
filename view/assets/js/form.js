@@ -118,9 +118,9 @@ PopovForm = {
   },
 
   getFieldGroups: function (fieldset) {
-    var fieldGroups = fieldset.find('.field-group'); //fieldset.find('.field-group');
+    var fieldGroups = fieldset.closestDescendent('.field-group');
     if (!fieldGroups.length) {
-      fieldGroups = fieldset.find('.form-group');
+      fieldGroups = fieldset.closestDescendent('.form-group');
       if (!fieldGroups.length) { // get last detached form-group element from cache
         fieldGroups = this.body.data(fieldset.attr('id') + '-form-group-template');
       }
@@ -140,3 +140,24 @@ PopovForm = {
 jQuery(document).ready(function ($) {
   PopovForm.attachEvents();
 });
+
+/**
+ * Closest Descendent filter
+ *
+ * Get the nearest children element in hierarchy by selector
+ *
+ * @link https://stackoverflow.com/a/8962023/1335142
+ */
+(function($) {
+  $.fn.closestDescendent = function(filter) {
+    var found = $(),
+      currentSet = this; // Current place
+    while (currentSet.length) {
+      found = currentSet.filter(filter);
+      if (found.length) break;  // At least one match: break loop
+      // Get all children of the current set
+      currentSet = currentSet.children();
+    }
+    return found.first(); // Return first match of the collection
+  }
+})(jQuery);
