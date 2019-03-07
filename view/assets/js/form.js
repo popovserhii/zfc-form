@@ -68,7 +68,7 @@ PopovForm = {
   addGroup: function () {
     var self = PopovForm;
     var fieldset = $('#' + $(this).data('group-id'));
-    var fieldGroups = self.getFieldGroups(fieldset);
+    var fieldGroups = self.getFieldGroup(fieldset);
 
     // Determine general count on first add action and than relay on only this value.
     // We cannot relay on number of element such as we don't know which element will be removed
@@ -82,7 +82,7 @@ PopovForm = {
     fieldGroupTemp.find('input, button, select, textarea, label').each(function () {
       var elm = $(this);
       var attrName = elm.is('label') ? 'for' : 'name';
-      var name = elm.attr(attrName).replace(/\d/, numGroup); // with many levels of fieldset may be problem with number replace
+      var name = elm.attr(attrName).replace(/\d/, numGroup); // with many levels of fieldset may have problem with number of replace
 
       if (elm.is('label')) {
         elm.attr(attrName, name);
@@ -105,25 +105,38 @@ PopovForm = {
   removeGroup: function () {
     var self = PopovForm;
     var elm = $(this);
-    var toRemoveGroup = self.getRemoveFieldGroup(elm);
+
     var fieldset = elm.closest('fieldset');
-    var fieldGroups = self.getFieldGroups(fieldset);
-    if (fieldGroups.length === 1) { // if we remove last group on page than add to cache
-      self.body.data(fieldset.attr('id') + '-form-group-template', toRemoveGroup.detach());
+    var fieldGroup = self.getFieldGroup(fieldset);
+    var fieldGroups = fieldGroup.siblings('.form-group').add(fieldGroup); // Here might be also '.field-group'
+
+    if (fieldGroups.length === 1) { // if we remove the last group on a page than add it to cache
+      self.body.data(fieldset.attr('id') + '-form-group-template', fieldGroups.first().detach());
     } else {
-      toRemoveGroup.remove();
+      fieldGroups.each(function (i, group) {
+        var fieldGroup = $(group);
+        // Remove the fieldGroup if button which has been clicked is found
+        var clickedButton = fieldGroup.find(elm);
+        if (clickedButton.length) {
+          fieldGroup.remove();
+
+          return false; // Break loop
+        }
+      });
+      //console.log(toRemoveGroup)
+      //toRemoveGroup.remove();
     }
 
     return false;
   },
 
-  getFieldGroups: function (fieldset) {
+  getFieldGroup: function (fieldset) {
     var fieldGroups = fieldset.closestDescendent('.field-group');
     if (!fieldGroups.length) {
       fieldGroups = fieldset.closestDescendent('.form-group');
-      if (!fieldGroups.length) { // get last detached form-group element from cache
-        fieldGroups = this.body.data(fieldset.attr('id') + '-form-group-template');
-      }
+    }
+    if (!fieldGroups.length) { // get last detached form-group element from cache
+      fieldGroups = this.body.data(fieldset.attr('id') + '-form-group-template');
     }
     return fieldGroups;
   },

@@ -41,6 +41,7 @@ use Zend\Form\Element\Submit;
 	<fieldset id="<?= $name ?>">
         <?php foreach ($elementOrFieldset as /*$_key =>*/$fieldset) : ?>
             <?php if ($elementOrFieldset->getOption('allow_add')) : // if we can add, then we can remove it ?>
+	            <?php //$fieldset->setAttribute('class', trim($fieldset->getAttribute('class') . ' field-group')); ?>
                 <?php //$submit = new Submit('remove-' . $name); ?>
                 <?php $submit = new Submit('remove'); ?>
 	            <?php $submit->setAttributes([
@@ -51,7 +52,7 @@ use Zend\Form\Element\Submit;
 	            ]); ?>
 		        <?php $fieldset->add($submit); ?>
 	        <?php endif; ?>
-			<div class="form-group">
+			<div class="form-group <?= $fieldset->getAttribute('class') ?>">
                 <?= $this->partial('form::element-group', ['fieldset' => $fieldset]) ?>
 			</div>
         <?php endforeach; ?>

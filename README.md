@@ -39,3 +39,5 @@ $element = $fieldset->add([
     ],
 ]);
 ```
+
+## Collection
